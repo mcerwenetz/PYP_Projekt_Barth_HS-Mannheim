@@ -1,0 +1,17 @@
+__pycache__/
+
+# No workspace settings
+.vscode
+
+# I do hate OSX
+.DS_Store
+
+# Log files #
+*.log
+
+# Package Files #
+*.zip
+*.tar.gz
+*.rar
+
+
