@@ -52,11 +52,14 @@ class Chat(ThemedTk):
 
         #Großer Textview in der Mitte
         chatview = tk.Label(self, height=10, width=50)
-        chatview.grid(column=0,row=1, sticky=tk.E+tk.W)
+        chatview.grid(column=0,row=1, sticky="nswe")
 
         # Submitbar unten
         chatview = InputBar(self)
         chatview.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
+
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0,weight=1)
 
         
 
