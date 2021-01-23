@@ -58,7 +58,10 @@ class Chat(ThemedTk):
         chatview = InputBar(self)
         chatview.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
 
+        # row1 (chatview) braucht n weight für resize in y richtung
+        # dann nimmt das label den extra space ein
         self.rowconfigure(1, weight=1)
+        #alle rows brauchen weight für resize in x richtung
         self.columnconfigure(0,weight=1)
 
         
