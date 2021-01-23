@@ -2,21 +2,33 @@ import tkinter as tk
 import tkinter.ttk as ttk 
 from ttkthemes import ThemedTk
 
-class Button_frm(ttk.Frame): 
+class MenubuttonFrame(ttk.Frame): 
 
     def __init__(self, master = None): 
         ttk.Frame.__init__(self, master)
 
-        refresh  = ttk.Button(self, text="Refresh" )
-        refresh.grid(row=0, column=0)
+        btn_refresh  = ttk.Button(self, text="Refresh" )
+        btn_refresh.grid(row=0, column=0)
 
-        settings = ttk.Button(self, text="Settings") 
-        settings.grid(row=0, column=1)
+        btn_settings = ttk.Button(self, text="Settings") 
+        btn_settings.grid(row=0, column=1)
         
-        beenden = ttk.Button(self, text="Quit" ) 
-        beenden.grid(row=0, column=2)
-         
+        btn_finish = ttk.Button(self, text="Quit" ) 
+        btn_finish.grid(row=0, column=2)
 
+class InputBar(ttk.Frame): 
+
+    def __init__(self, master = None): 
+        ttk.Frame.__init__(self, master)
+
+        inputField  = ttk.Entry(self)
+        inputField.grid(row=0, column=0, sticky=tk.E+tk.W )
+
+        btn_submit = ttk.Button(self, text="Submit") 
+        btn_submit.grid(row=0, column=1, sticky=tk.E+tk.W)
+        
+        self.columnconfigure(0, weight=1)
+        
 
 class Chat(ThemedTk): 
     
@@ -25,10 +37,7 @@ class Chat(ThemedTk):
         
         #title of window            
         self.wm_title("Hochschul Chat")
-        
-        #mindest Größe
-        self.minsize(800,300)
-        
+
         #style 
         self.set_theme(theme)
         #print(self.get_themes()) # zeigt verfügbare themes 
@@ -38,10 +47,20 @@ class Chat(ThemedTk):
         self.update()
 
         #Buttonreihe oben   
-        Buttons = Button_frm(self)
-        Buttons.grid(row=0, column =0)
-     
-    
+        menubuttons = MenubuttonFrame(self)
+        menubuttons.grid(column=0, row=0, sticky=tk.W)
+
+        #Großer Textview in der Mitte
+        chatview = tk.Label(self, height=10, width=50)
+        chatview.grid(column=0,row=1, sticky=tk.E+tk.W)
+
+        # Submitbar unten
+        chatview = InputBar(self)
+        chatview.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
+
+        
+
+
 
 if __name__ == "__main__":
     chat = Chat(theme ="breeze")  #https://ttkthemes.readthedocs.io/en/latest/themes.html
