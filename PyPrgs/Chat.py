@@ -79,10 +79,32 @@ class InputBar(ttk.Frame):
 
         self.btn_submit = ttk.Button(self, text="Submit") 
         self.btn_submit.grid(row=0, column=1, sticky=tk.E+tk.W)
-        
+
         # textbar soll all den verfügbaren platz der row bekommen
         self.columnconfigure(0, weight=1)
-        
+
+class SettingsWindow(tk.Frame):
+    def __init__(self, master = None): 
+        tk.Frame.__init__(self,master)
+        self.lbl_nickname=tk.Label(self,text="kuerzel")
+        self.lbl_nickname.grid(row=0, column=0)
+        self.entry_nickname = tk.Entry(self)
+        self.entry_nickname.grid(row=0, column=1)
+
+
+        self.lbl_auto_refresh=tk.Label(self,text="auto refresh")
+        self.lbl_nickname.grid(row=1, column=0)
+        self.chkbtn_autoupdate=tk.Checkbutton(self)
+        self.chkbtn_autoupdate.grid(row=1, column=1)
+
+        self.btn_frame=tk.Frame(self)
+        self.btn_frame.grid(column=0,row=3,columnspan=2)
+        self.btn_cancel=tk.Button(self.btn_frame, text="Cancel")
+        self.btn_cancel.grid(row=0, column=0)
+        self.btn_ok=tk.Button(self.btn_frame, text="Ok")
+        self.btn_ok.grid(row=0,column=0)
+
+
 
 class Chat(ThemedTk):
     """
