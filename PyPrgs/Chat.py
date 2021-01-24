@@ -48,16 +48,16 @@ class Chat(ThemedTk):
         self.update()
 
         #Buttonreihe oben   
-        menubuttons = MenubuttonFrame(self)
-        menubuttons.grid(column=0, row=0, sticky=tk.W)
+        self.menubuttons = MenubuttonFrame(self)
+        self.menubuttons.grid(column=0, row=0, sticky=tk.W)
 
         #Großer Textview in der Mitte
-        chatview = tk.Label(self, height=10, width=50)
-        chatview.grid(column=0,row=1, sticky="nswe")
+        self.lbl_chatview = tk.Label(self, height=10, width=50)
+        self.lbl_chatview.grid(column=0,row=1, sticky="nswe")
 
         # Submitbar unten
-        chatview = InputBar(self)
-        chatview.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
+        self.inputBar = InputBar(self)
+        self.inputBar.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
 
         # row1 (chatview) braucht n weight für resize in y richtung
         # dann nimmt das label den extra space ein
