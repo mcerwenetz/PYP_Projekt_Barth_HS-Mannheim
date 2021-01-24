@@ -20,19 +20,43 @@ class MenubuttonFrame(ttk.Frame):
     
     btn_finish : ttk.Button
         Wenn man diesen Button drückt wird das Programm beendet.
+
+
+    Methods
+    --------
+    
+    quit_cmd(self)
+        Schließt das Chatfenster
+
+    refresh(self)
+        Aktualisiert den Chatverlauf
     """
     def __init__(self, master = None): 
         ttk.Frame.__init__(self, master)
 
         self.btn_refresh  = ttk.Button(self, text="Refresh",
-         command=Chat.quit_cmd)
+         command=self.refresh)
         self.btn_refresh.grid(row=0, column=0)
 
         self.btn_settings = ttk.Button(self, text="Settings") 
         self.btn_settings.grid(row=0, column=1)
         
-        self.btn_finish = ttk.Button(self, text="Quit" ) 
+        self.btn_finish = ttk.Button(self, text="Quit", command=self.quit_cmd) 
         self.btn_finish.grid(row=0, column=2)
+
+    def quit_cmd(self):
+        """Beenden des Mainframes."""
+        self.master.destroy()
+
+    def refresh(self):
+        """Aktualisierung des Chatverlaufs"""
+        msgs = Chat.chat_get()
+        msgs = list(msgs.splitlines())
+        msgs.reverse()
+        #todo hier text box nachrichten löschen 
+        for m in msgs: 
+            #todo hier wieder nachrichten einfügen 
+            print(m)
 
 class InputBar(ttk.Frame):
     """
@@ -82,12 +106,6 @@ class Chat(ThemedTk):
         Diese Methode erstellt alle Frames und Widgets
         im Chatfenster.
 
-    quit_cmd(self)
-        Schließt das Chatfenster
-
-    refresh(self)
-        Aktualisiert den Chatverlauf
-
     chat_get(self)
         Holt den Chatverlauf vom Server
 
@@ -96,7 +114,6 @@ class Chat(ThemedTk):
         unter dem username usr
         default ist Anon.
     """
-
     def __init__(self, theme = 'default'):
         """
         Initialisierung des Mainframes.
@@ -144,21 +161,6 @@ class Chat(ThemedTk):
         #alle rows brauchen weight für resize in x richtung
         self.columnconfigure(0,weight=1)
     
-    def quit_cmd(self):
-        """Beenden des Mainframes."""
-        self.destroy()
-        
-
-    def refresh(self):
-        """Aktualisierung des Chatverlaufs"""
-        msgs = chat_get()
-        msgs = list(msgs.splitlines())
-        msgs.reverse()
-        #todo hier text box nachrichten löschen 
-        for m in msgs: 
-            #todo hier wieder nachrichten einfügen 
-            print(m)
-
 
     def chat_get(self):
         """Chatverlauf von Server holen."""
@@ -167,7 +169,7 @@ class Chat(ThemedTk):
             return None
         return resp.read().decode("UTF-8")
 
-    def chat_post(msg, usr = "Anon"):
+    def chat_post(self, msg, usr = "Anon"):
         """Neue Nachricht auf Server posten"""
         msg = "["+usr+"] " + msg 
         data = msg.encode("UTF-8")
