@@ -1,13 +1,17 @@
 import tkinter as tk 
 import tkinter.ttk as ttk 
+import urllib.request 
+import urllib.parse
 from ttkthemes import ThemedTk
+CHAT_URL = "https://pma.inftech.hs-mannheim.de/wsgi/chat"
+
 
 class MenubuttonFrame(ttk.Frame): 
 
     def __init__(self, master = None): 
         ttk.Frame.__init__(self, master)
 
-        self.btn_refresh  = ttk.Button(self, text="Refresh" )
+        self.btn_refresh  = ttk.Button(self, text="Refresh", command=Chat.quit_cmd)
         self.btn_refresh.grid(row=0, column=0)
 
         self.btn_settings = ttk.Button(self, text="Settings") 
@@ -47,6 +51,9 @@ class Chat(ThemedTk):
         self.configure(background = "ghost white")
         self.update()
 
+        self.create_widgets()
+
+    def create_widgets(self): 
         #Buttonreihe oben   
         self.menubuttons = MenubuttonFrame(self)
         self.menubuttons.grid(column=0, row=0, sticky=tk.W)
@@ -64,12 +71,42 @@ class Chat(ThemedTk):
         self.rowconfigure(1, weight=1)
         #alle rows brauchen weight für resize in x richtung
         self.columnconfigure(0,weight=1)
-
+    
+    def quit_cmd(self): 
+        self.destroy()
         
+
+
+    def refresh(self): 
+        msgs = chat_get()
+        msgs = list(msgs.splitlines())
+        msgs.reverse()
+        #todo hier text box nachrichten löschen 
+        for m in msgs: 
+            #todo hier wieder nachrichten einfügen 
+            print(m)
+
+
+    def chat_get():
+        resp = urllib.request.urlopen(CHAT_URL)
+        if not resp.status==200: 
+            return None
+        return resp.read().decode("UTF-8")
+
+    def chat_post(msg, usr = "Anon"):
+        msg = "["+usr+"] " + msg 
+        data = msg.encode("UTF-8")
+        
+        req = urllib.request.Request(CHAT_URL, data = data)
+        req.add_header("Content-Type", "text/plain")
+        
+        resp = urllib.request.urlopen(req)
+        if not 200 <= resp.status <= 299:  
+            return None
+        return resp.read().decode("UTF-8")
 
 
 
 if __name__ == "__main__":
     chat = Chat(theme ="breeze")  #https://ttkthemes.readthedocs.io/en/latest/themes.html
     chat.mainloop()
-    
