@@ -31,32 +31,21 @@ class MenubuttonFrame(ttk.Frame):
     refresh(self)
         Aktualisiert den Chatverlauf
     """
-    def __init__(self, master = None): 
+    def __init__(self, master = None, cb_Refresh=None, cb_Settings=None, cb_Quit=None): 
         ttk.Frame.__init__(self, master)
+        # self.cb_Refresh = cb_Refresh
+        # self.cb_Settings =cb_Settings
+        # self.cb_Quit = cb_Quit
 
-        self.btn_refresh  = ttk.Button(self, text="Refresh",
-         command=self.refresh)
+        self.btn_refresh  = ttk.Button(self, text="Refresh", command=cb_Refresh)
         self.btn_refresh.grid(row=0, column=0)
 
-        self.btn_settings = ttk.Button(self, text="Settings") 
+        self.btn_settings = ttk.Button(self, text="Settings", command=cb_Settings) 
         self.btn_settings.grid(row=0, column=1)
         
-        self.btn_finish = ttk.Button(self, text="Quit", command=self.quit_cmd) 
+        self.btn_finish = ttk.Button(self, text="Quit", command=cb_Quit) 
         self.btn_finish.grid(row=0, column=2)
 
-    def quit_cmd(self):
-        """Beenden des Mainframes."""
-        self.master.destroy()
-
-    def refresh(self):
-        """Aktualisierung des Chatverlaufs"""
-        msgs = Chat.chat_get()
-        msgs = list(msgs.splitlines())
-        msgs.reverse()
-        #todo hier text box nachrichten löschen 
-        for m in msgs: 
-            #todo hier wieder nachrichten einfügen 
-            print(m)
 
 class InputBar(ttk.Frame):
     """
@@ -83,26 +72,24 @@ class InputBar(ttk.Frame):
         # textbar soll all den verfügbaren platz der row bekommen
         self.columnconfigure(0, weight=1)
 
-class SettingsWindow(tk.Frame):
+class SettingsWindow(ttk.Frame):
     def __init__(self, master = None): 
-        tk.Frame.__init__(self,master)
-        self.lbl_nickname=tk.Label(self,text="kuerzel")
+        ttk.Frame.__init__(self,master)
+        self.lbl_nickname=ttk.Label(self,text="Kuerzel")
         self.lbl_nickname.grid(row=0, column=0)
-        self.entry_nickname = tk.Entry(self)
+        self.entry_nickname = ttk.Entry(self, width=5)
         self.entry_nickname.grid(row=0, column=1)
 
 
-        self.lbl_auto_refresh=tk.Label(self,text="auto refresh")
-        self.lbl_nickname.grid(row=1, column=0)
-        self.chkbtn_autoupdate=tk.Checkbutton(self)
+        self.lbl_auto_refresh=ttk.Label(self,text="auto refresh")
+        self.lbl_auto_refresh.grid(row=1, column=0)
+        self.chkbtn_autoupdate=ttk.Checkbutton(self)
         self.chkbtn_autoupdate.grid(row=1, column=1)
 
-        self.btn_frame=tk.Frame(self)
-        self.btn_frame.grid(column=0,row=3,columnspan=2)
-        self.btn_cancel=tk.Button(self.btn_frame, text="Cancel")
-        self.btn_cancel.grid(row=0, column=0)
-        self.btn_ok=tk.Button(self.btn_frame, text="Ok")
-        self.btn_ok.grid(row=0,column=0)
+        self.btn_cancel=ttk.Button(self, text="Cancel")
+        self.btn_cancel.grid(row=2, column=0)
+        self.btn_ok=ttk.Button(self, text="Ok")
+        self.btn_ok.grid(row=2,column=1)
 
 
 
@@ -166,7 +153,7 @@ class Chat(ThemedTk):
         Initialisierung und Bindung der Subframes.
         """
         #Buttonreihe oben   
-        self.menubuttons = MenubuttonFrame(self)
+        self.menubuttons = MenubuttonFrame(self,cb_Refresh= self.refresh,cb_Settings=self.toplevel_settings, cb_Quit=self.quit)
         self.menubuttons.grid(column=0, row=0, sticky=tk.W)
 
         #Großer Textview in der Mitte
@@ -183,6 +170,29 @@ class Chat(ThemedTk):
         #alle rows brauchen weight für resize in x richtung
         self.columnconfigure(0,weight=1)
     
+
+
+    def refresh(self):
+        """Aktualisierung des Chatverlaufs"""
+        msgs = self.chat_get()
+        msgs = list(msgs.splitlines())
+        msgs.reverse()
+        #todo hier text box nachrichten löschen 
+        for m in msgs: 
+            #todo hier wieder nachrichten einfügen 
+            print(m)
+
+    def toplevel_settings(self): 
+        toplevel = tk.Toplevel(self)
+        toplevel.title("Settings")
+        top = SettingsWindow(toplevel)
+        top.grid()
+        
+
+    def quit(self):
+        """Beenden des Mainframes."""
+        self.destroy()
+
 
     def chat_get(self):
         """Chatverlauf von Server holen."""
