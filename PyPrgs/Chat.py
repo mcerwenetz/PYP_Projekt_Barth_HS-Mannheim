@@ -144,7 +144,6 @@ class Chat(ThemedTk):
         """
         ThemedTk.__init__(self)
         self.nickname= "Anon"
-        self.auto_refresh_enabled = False
                 
         #title of window            
         self.wm_title("Hochschul Chat")
@@ -153,7 +152,7 @@ class Chat(ThemedTk):
         self.set_theme(theme)
         #print(self.get_themes()) # zeigt verfügbare themes 
 
-        self.settings_open = False
+        self.settings_already_opend = False
         
         #Hintergrund 
         self.configure(background = "ghost white")
@@ -161,8 +160,17 @@ class Chat(ThemedTk):
 
         self.create_widgets()
 
-        self.auto_update_alive = False
-        self.auto_update = Thread(target=self.run_auto_update)
+        #tk variable für die settings. wir brauchen zwei variabeln weil wenn
+        # wir im thread auf die tk variable prüfen
+        # kann es sein dass der thread startet oder stoppt bevor ok gedrückt
+        # wurde und das wäre nicht userfreundlich und könnte problematisch werden
+        self.auto_refresh_checked_settings = tk.BooleanVar()
+        self.auto_refresh_checked_settings.set(False)
+        # Die gesonderte Threadvariable. Der Thread checkt hier ob er wirklich noch
+        # refreshen soll. wird nur verändert durch ein drücken auf ok in den settings
+        self.keep_refreshing = False
+
+        self.auto_update_thread = Thread(target=self.run_auto_update)
 
     def create_widgets(self):
         """
@@ -205,18 +213,20 @@ class Chat(ThemedTk):
     
         self.chatbox.see('end')
         self.chatbox.configure(state='disabled') 
+
         
     def toplevel_settings(self):
         """SettingsToplevel dass dann SettingsWindow übergeben wird. Kann nur einmal
         geöffnet werden."""
-        if not self.settings_open:
-            self.settings_open = True
+        if not self.settings_already_opend:
+            self.settings_already_opend = True
             self.toplevel = tk.Toplevel(self)
             self.toplevel.title("Settings")
             self.top = SettingsWindow(self.toplevel)
             self.top.btn_ok["command"] = self.save_and_exit
             self.top.btn_cancel["command"] = self.cancel_and_exit
             self.top.grid()
+            self.top.chkbtn_autoupdate["variable"] = self.auto_refresh_checked_settings
             #Wenn das Window über Window Decoration geschlossen wird soll auch
             #das settings_open flag resettet werden.
             #sonst gehen ja keine Fenster mehr auf
@@ -225,14 +235,19 @@ class Chat(ThemedTk):
         
     def save_and_exit(self):
         "methode die gerufen wird wenn ok in den Settings ok gedrückt wurde"
-        self.settings_open = False
+        self.settings_already_opend = False
         self.nickname = self.top.entry_nickname.get()
+        auto_update = self.auto_refresh_checked_settings.get()
+        if(auto_update and not self.auto_update_thread.is_alive()):
+            self.start_auto_update()
+        elif(not auto_update):
+            self.stop_auto_update()
         self.toplevel.destroy()
 
 
     def cancel_and_exit(self):
         "methode die gerufen wird wenn ok in den Settings cancel gedrückt wurde"
-        self.settings_open = False
+        self.settings_already_opend = False
         self.toplevel.destroy()
 
     def quit(self):
@@ -258,17 +273,20 @@ class Chat(ThemedTk):
         urllib.request.urlopen(req)
         self.refresh()
 
-    def run_auto_update(self): 
-        while self.auto_update_alive: 
+    def run_auto_update(self):
+        """callable für den auto refresh thread"""
+        while self.keep_refreshing == True: 
             self.refresh() 
             sleep(3)
 
     def start_auto_update(self):
-        self.auto_update_alive = True
-        self.auto_update.start() 
+        """startet den auto refresh thread"""
+        self.keep_refreshing = True
+        self.auto_update_thread.start() 
 
     def stop_auto_update(self): 
-        self.auto_update_alive = False
+        """stoppt den auto refresh thread"""
+        self.keep_refreshing = False
 
 
 if __name__ == "__main__":
