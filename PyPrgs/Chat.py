@@ -141,6 +141,8 @@ class Chat(ThemedTk):
         #style 
         self.set_theme(theme)
         #print(self.get_themes()) # zeigt verfügbare themes 
+
+        self.settings_open = False
         
         #Hintergrund 
         self.configure(background = "ghost white")
@@ -180,14 +182,22 @@ class Chat(ThemedTk):
         #todo hier text box nachrichten löschen 
         for m in msgs: 
             #todo hier wieder nachrichten einfügen 
-            print(m)
+            self.lbl_chatview
 
-    def toplevel_settings(self): 
-        toplevel = tk.Toplevel(self)
-        toplevel.title("Settings")
-        top = SettingsWindow(toplevel)
-        top.grid()
+    def toplevel_settings(self):
+        if not self.settings_open:
+            self.settings_open = True
+            self.toplevel = tk.Toplevel(self)
+            self.toplevel.overrideredirect(True)
+            self.toplevel.title("Settings")
+            self.top = SettingsWindow(self.toplevel)
+            self.top.btn_ok["command"] = self.save_and_exit
+            self.top.grid()
         
+    def save_and_exit(self):
+        self.settings_open = False
+        self.toplevel.destroy()
+
 
     def quit(self):
         """Beenden des Mainframes."""
