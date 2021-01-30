@@ -3,8 +3,8 @@ import tkinter.ttk as ttk
 import urllib.request 
 import urllib.parse
 from ttkthemes import ThemedTk
-
-
+from threading import Thread 
+from time import sleep 
 
 CHAT_URL = "https://pma.inftech.hs-mannheim.de/wsgi/chat"
 
@@ -158,6 +158,9 @@ class Chat(ThemedTk):
 
         self.create_widgets()
 
+        self.auto_update_alive = False
+        self.auto_update = Thread(target=self.run_auto_update)
+
     def create_widgets(self):
         """
         Initialisierung und Bindung der Subframes.
@@ -227,6 +230,20 @@ class Chat(ThemedTk):
 
         urllib.request.urlopen(req)
         self.refresh()
+
+
+    def run_auto_update(self): 
+        while self.auto_update_alive: 
+            self.refresh() 
+            sleep(3)
+
+    def start_auto_update(self):
+        self.auto_update_alive = True
+        self.auto_update.start() 
+
+    def stop_auto_update(self): 
+        self.auto_update_alive = False
+
 
 
 
