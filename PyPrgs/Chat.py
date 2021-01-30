@@ -88,7 +88,7 @@ class SettingsWindow(ttk.Frame):
         self.lbl_nickname.grid(row=0, column=0)
         self.entry_nickname = ttk.Entry(self, width=10)
         self.entry_nickname.grid(row=0, column=1)
-        
+
         self.lbl_auto_refresh=ttk.Label(self,text="auto refresh")
         self.lbl_auto_refresh.grid(row=1, column=0)
         self.chkbtn_autoupdate=ttk.Checkbutton(self)
@@ -151,6 +151,7 @@ class Chat(ThemedTk):
         self.set_theme(theme)
         #print(self.get_themes()) # zeigt verfügbare themes 
 
+        #für toplevel settings, verhindert mehrere Fenster
         self.settings_already_opend = False
         
         #Hintergrund 
@@ -170,6 +171,8 @@ class Chat(ThemedTk):
         self.keep_refreshing = False
 
         self.auto_update_thread = Thread(target=self.run_auto_update)
+
+        self.protocol("WM_DELETE_WINDOW", self.quit)
 
     def create_widgets(self):
         """
@@ -256,8 +259,8 @@ class Chat(ThemedTk):
 
     def quit(self):
         """Beenden des Mainframes."""
+        self.stop_auto_update()
         self.destroy()
-    
 
     def chat_get(self):
         """Chatverlauf von Server holen."""
