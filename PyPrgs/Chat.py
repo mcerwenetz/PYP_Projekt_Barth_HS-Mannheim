@@ -86,10 +86,9 @@ class SettingsWindow(ttk.Frame):
         ttk.Frame.__init__(self,master)
         self.lbl_nickname=ttk.Label(self,text="Nickname")
         self.lbl_nickname.grid(row=0, column=0)
-        self.entry_nickname = ttk.Entry(self, width=5)
+        self.entry_nickname = ttk.Entry(self, width=10)
         self.entry_nickname.grid(row=0, column=1)
-
-
+        
         self.lbl_auto_refresh=ttk.Label(self,text="auto refresh")
         self.lbl_auto_refresh.grid(row=1, column=0)
         self.chkbtn_autoupdate=ttk.Checkbutton(self)
@@ -181,15 +180,20 @@ class Chat(ThemedTk):
         cb_Settings=self.toplevel_settings, cb_Quit=self.quit)
         self.menubuttons.grid(column=0, row=0, sticky=tk.W)
 
-        #Großer Textview in der Mitte
+        #Großer Textview in der Mitte + scrollbar
         self.chatbox = tk.Text(self, height=10, width=50) 
         self.chatbox.grid(column=0,row=1, sticky="nswe")
         self.chatbox.configure(state='disabled')
         self.refresh()
+        
+        self.scrollbar = ttk.Scrollbar(self)
+        self.scrollbar.grid(column=1,row=1, sticky= tk.N+tk.S)
+        self.scrollbar["command"] = self.chatbox.yview
+        self.chatbox["yscrollcommand"] = self.scrollbar.set
 
         # Submitbar unten
         self.inputBar = InputBar(self, cb_post=self.chat_post)
-        self.inputBar.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
+        self.inputBar.grid(column=0, row=2, columnspan=2,sticky=tk.E+tk.W+tk.S)
 
         # row1 (chatview) braucht n weight für resize in y richtung
         # dann nimmt das label den extra space ein
