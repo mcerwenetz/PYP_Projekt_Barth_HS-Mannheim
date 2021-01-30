@@ -143,7 +143,8 @@ class Chat(ThemedTk):
             Das ttk Theme.
         """
         ThemedTk.__init__(self)
-        self.nickname= "Ano"
+        self.nickname= "Anon"
+        self.auto_refresh_enabled = False
                 
         #title of window            
         self.wm_title("Hochschul Chat")
@@ -165,7 +166,8 @@ class Chat(ThemedTk):
         Initialisierung und Bindung der Subframes.
         """
         #Buttonreihe oben   
-        self.menubuttons = MenubuttonFrame(self,cb_Refresh= self.refresh,cb_Settings=self.toplevel_settings, cb_Quit=self.quit)
+        self.menubuttons = MenubuttonFrame(self,cb_Refresh= self.refresh,
+        cb_Settings=self.toplevel_settings, cb_Quit=self.quit)
         self.menubuttons.grid(column=0, row=0, sticky=tk.W)
 
         #Großer Textview in der Mitte
@@ -191,6 +193,7 @@ class Chat(ThemedTk):
         msgs = list(self.chat_get().splitlines())
         msgs = reversed(msgs)
 
+        #textfeld soll read only sein
         self.chatbox.configure(state='normal')
         self.chatbox.delete(1.0, 'end')
        
@@ -211,6 +214,9 @@ class Chat(ThemedTk):
             self.top.btn_ok["command"] = self.save_and_exit
             self.top.btn_cancel["command"] = self.cancel_and_exit
             self.top.grid()
+            #Wenn das Window über Window Decoration geschlossen wird soll auch
+            #das settings_open flag resettet werden.
+            #sonst gehen ja keine Fenster mehr auf
             self.toplevel.protocol("WM_DELETE_WINDOW", self.cancel_and_exit)
 
         
@@ -248,8 +254,6 @@ class Chat(ThemedTk):
 
         urllib.request.urlopen(req)
         self.refresh()
-
-
 
 
 if __name__ == "__main__":
