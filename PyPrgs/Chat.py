@@ -3,6 +3,9 @@ import tkinter.ttk as ttk
 import urllib.request 
 import urllib.parse
 from ttkthemes import ThemedTk
+
+
+
 CHAT_URL = "https://pma.inftech.hs-mannheim.de/wsgi/chat"
 
 class MenubuttonFrame(ttk.Frame):
@@ -33,9 +36,6 @@ class MenubuttonFrame(ttk.Frame):
     """
     def __init__(self, master = None, cb_Refresh=None, cb_Settings=None, cb_Quit=None): 
         ttk.Frame.__init__(self, master)
-        # self.cb_Refresh = cb_Refresh
-        # self.cb_Settings =cb_Settings
-        # self.cb_Quit = cb_Quit
 
         self.btn_refresh  = ttk.Button(self, text="Refresh", command=cb_Refresh)
         self.btn_refresh.grid(row=0, column=0)
@@ -60,17 +60,26 @@ class InputBar(ttk.Frame):
         Wenn man diesen Button drückt wird der Inhalt des inputFields
         geposted
     """
-    def __init__(self, master = None): 
+    def __init__(self, master = None, cb_post=None): 
         ttk.Frame.__init__(self, master)
+
+        def post(self): 
+            cb_post()
 
         self.inputField  = ttk.Entry(self)
         self.inputField.grid(row=0, column=0, sticky=tk.E+tk.W )
+        self.inputField.bind("<Return>", post)
 
-        self.btn_submit = ttk.Button(self, text="Submit") 
+        self.btn_submit = ttk.Button(self, text="Submit", command=cb_post) 
         self.btn_submit.grid(row=0, column=1, sticky=tk.E+tk.W)
 
         # textbar soll all den verfügbaren platz der row bekommen
         self.columnconfigure(0, weight=1)
+    
+    def get_msg(self): 
+        msg = self.inputField.get()
+        self.inputField.delete(0, tk.END)
+        return msg
 
 class SettingsWindow(ttk.Frame):
     def __init__(self, master = None): 
@@ -134,7 +143,8 @@ class Chat(ThemedTk):
             Das ttk Theme.
         """
         ThemedTk.__init__(self)
-        
+        self.nickname= "Ano"
+                
         #title of window            
         self.wm_title("Hochschul Chat")
 
@@ -157,11 +167,13 @@ class Chat(ThemedTk):
         self.menubuttons.grid(column=0, row=0, sticky=tk.W)
 
         #Großer Textview in der Mitte
-        self.lbl_chatview = tk.Label(self, height=10, width=50)
-        self.lbl_chatview.grid(column=0,row=1, sticky="nswe")
+        self.chatbox = tk.Text(self, height=10, width=50) 
+        self.chatbox.grid(column=0,row=1, sticky="nswe")
+        self.chatbox.configure(state='disabled')
+        self.refresh()
 
         # Submitbar unten
-        self.inputBar = InputBar(self)
+        self.inputBar = InputBar(self, cb_post=self.chat_post)
         self.inputBar.grid(column=0, row=2, sticky=tk.E+tk.W+tk.S)
 
         # row1 (chatview) braucht n weight für resize in y richtung
@@ -174,13 +186,15 @@ class Chat(ThemedTk):
 
     def refresh(self):
         """Aktualisierung des Chatverlaufs"""
-        msgs = self.chat_get()
-        msgs = list(msgs.splitlines())
-        msgs.reverse()
-        #todo hier text box nachrichten löschen 
+        msgs = list(self.chat_get().splitlines())
+        msgs = reversed(msgs)
+        self.chatbox.delete('1.0', 'end')
+
         for m in msgs: 
-            #todo hier wieder nachrichten einfügen 
-            print(m)
+            self.chatbox.configure(state='normal')
+            self.chatbox.insert('end', m +"\n" )
+            self.chatbox.configure(state='disabled') 
+            self.chatbox.see('end')
 
     def toplevel_settings(self): 
         toplevel = tk.Toplevel(self)
@@ -192,7 +206,7 @@ class Chat(ThemedTk):
     def quit(self):
         """Beenden des Mainframes."""
         self.destroy()
-
+    
 
     def chat_get(self):
         """Chatverlauf von Server holen."""
@@ -201,18 +215,17 @@ class Chat(ThemedTk):
             return None
         return resp.read().decode("UTF-8")
 
-    def chat_post(self, msg, usr = "Anon"):
+    def chat_post(self):
         """Neue Nachricht auf Server posten"""
-        msg = "["+usr+"] " + msg 
+        msg = "["+self.nickname+"] " + self.inputBar.get_msg() 
         data = msg.encode("UTF-8")
-        
+    
         req = urllib.request.Request(CHAT_URL, data = data)
         req.add_header("Content-Type", "text/plain")
-        
-        resp = urllib.request.urlopen(req)
-        if not 200 <= resp.status <= 299:  
-            return None
-        return resp.read().decode("UTF-8")
+
+        urllib.request.urlopen(req)
+        self.refresh()
+
 
 
 
