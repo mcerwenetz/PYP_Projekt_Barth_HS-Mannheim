@@ -84,7 +84,7 @@ class InputBar(ttk.Frame):
 class SettingsWindow(ttk.Frame):
     def __init__(self, master = None): 
         ttk.Frame.__init__(self,master)
-        self.lbl_nickname=ttk.Label(self,text="Kuerzel")
+        self.lbl_nickname=ttk.Label(self,text="Nickname")
         self.lbl_nickname.grid(row=0, column=0)
         self.entry_nickname = ttk.Entry(self, width=5)
         self.entry_nickname.grid(row=0, column=1)
@@ -212,12 +212,14 @@ class Chat(ThemedTk):
             self.top.btn_cancel["command"] = self.cancel_and_exit
             self.top.grid()
             self.toplevel.protocol("WM_DELETE_WINDOW", self.cancel_and_exit)
+
         
     def save_and_exit(self):
         "methode die gerufen wird wenn ok in den Settings ok gedrückt wurde"
         self.settings_open = False
-        #hier noch einstellungen speichern
+        self.nickname = self.top.entry_nickname.get()
         self.toplevel.destroy()
+
 
     def cancel_and_exit(self):
         "methode die gerufen wird wenn ok in den Settings cancel gedrückt wurde"
