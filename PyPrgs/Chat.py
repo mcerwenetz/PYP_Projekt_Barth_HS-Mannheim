@@ -185,19 +185,28 @@ class Chat(ThemedTk):
             self.lbl_chatview
 
     def toplevel_settings(self):
+        """SettingsToplevel dass dann SettingsWindow übergeben wird. Kann nur einmal
+        geöffnet werden."""
         if not self.settings_open:
             self.settings_open = True
             self.toplevel = tk.Toplevel(self)
-            self.toplevel.overrideredirect(True)
             self.toplevel.title("Settings")
             self.top = SettingsWindow(self.toplevel)
             self.top.btn_ok["command"] = self.save_and_exit
+            self.top.btn_cancel["command"] = self.cancel_and_exit
             self.top.grid()
+            self.toplevel.protocol("WM_DELETE_WINDOW", self.cancel_and_exit)
         
     def save_and_exit(self):
+        "methode die gerufen wird wenn ok in den Settings ok gedrückt wurde"
         self.settings_open = False
+        #hier noch einstellungen speichern
         self.toplevel.destroy()
 
+    def cancel_and_exit(self):
+        "methode die gerufen wird wenn ok in den Settings cancel gedrückt wurde"
+        self.settings_open = False
+        self.toplevel.destroy()
 
     def quit(self):
         """Beenden des Mainframes."""
