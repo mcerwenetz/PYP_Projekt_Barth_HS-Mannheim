@@ -188,14 +188,16 @@ class Chat(ThemedTk):
         """Aktualisierung des Chatverlaufs"""
         msgs = list(self.chat_get().splitlines())
         msgs = reversed(msgs)
-        self.chatbox.delete('1.0', 'end')
 
+        self.chatbox.configure(state='normal')
+        self.chatbox.delete(1.0, 'end')
+       
         for m in msgs: 
-            self.chatbox.configure(state='normal')
             self.chatbox.insert('end', m +"\n" )
-            self.chatbox.configure(state='disabled') 
-            self.chatbox.see('end')
-
+    
+        self.chatbox.see('end')
+        self.chatbox.configure(state='disabled') 
+        
     def toplevel_settings(self): 
         toplevel = tk.Toplevel(self)
         toplevel.title("Settings")
