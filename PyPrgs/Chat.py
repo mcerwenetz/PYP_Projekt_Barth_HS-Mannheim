@@ -84,7 +84,7 @@ class InputBar(ttk.Frame):
 class SettingsWindow(ttk.Frame):
     def __init__(self, master = None): 
         ttk.Frame.__init__(self,master)
-        self.lbl_nickname=ttk.Label(self,text="Kuerzel")
+        self.lbl_nickname=ttk.Label(self,text="Nickname")
         self.lbl_nickname.grid(row=0, column=0)
         self.entry_nickname = ttk.Entry(self, width=5)
         self.entry_nickname.grid(row=0, column=1)
@@ -151,6 +151,8 @@ class Chat(ThemedTk):
         #style 
         self.set_theme(theme)
         #print(self.get_themes()) # zeigt verfügbare themes 
+
+        self.settings_open = False
         
         #Hintergrund 
         self.configure(background = "ghost white")
@@ -201,12 +203,31 @@ class Chat(ThemedTk):
         self.chatbox.see('end')
         self.chatbox.configure(state='disabled') 
         
-    def toplevel_settings(self): 
-        toplevel = tk.Toplevel(self)
-        toplevel.title("Settings")
-        top = SettingsWindow(toplevel)
-        top.grid()
+    def toplevel_settings(self):
+        """SettingsToplevel dass dann SettingsWindow übergeben wird. Kann nur einmal
+        geöffnet werden."""
+        if not self.settings_open:
+            self.settings_open = True
+            self.toplevel = tk.Toplevel(self)
+            self.toplevel.title("Settings")
+            self.top = SettingsWindow(self.toplevel)
+            self.top.btn_ok["command"] = self.save_and_exit
+            self.top.btn_cancel["command"] = self.cancel_and_exit
+            self.top.grid()
+            self.toplevel.protocol("WM_DELETE_WINDOW", self.cancel_and_exit)
+
         
+    def save_and_exit(self):
+        "methode die gerufen wird wenn ok in den Settings ok gedrückt wurde"
+        self.settings_open = False
+        self.nickname = self.top.entry_nickname.get()
+        self.toplevel.destroy()
+
+
+    def cancel_and_exit(self):
+        "methode die gerufen wird wenn ok in den Settings cancel gedrückt wurde"
+        self.settings_open = False
+        self.toplevel.destroy()
 
     def quit(self):
         """Beenden des Mainframes."""
