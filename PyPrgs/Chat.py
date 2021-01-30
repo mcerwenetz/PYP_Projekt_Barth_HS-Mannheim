@@ -142,8 +142,8 @@ class Chat(ThemedTk):
             Das ttk Theme.
         """
         ThemedTk.__init__(self)
-        self.nickname= "Anon"
-                
+        #Default ist Anon
+        self.nickname="Anon"
         #title of window            
         self.wm_title("Hochschul Chat")
 
@@ -230,6 +230,9 @@ class Chat(ThemedTk):
             self.top.btn_ok["command"] = self.save_and_exit
             self.top.btn_cancel["command"] = self.cancel_and_exit
             self.top.grid()
+            # settings den nickname mitgeben
+            self.top.entry_nickname.insert(0,self.nickname)
+            #gemeinsame variable zwischen chat und den settings
             self.top.chkbtn_autoupdate["variable"] = self.auto_refresh_checked_settings
             #Wenn das Window über Window Decoration geschlossen wird soll auch
             #das settings_open flag resettet werden.
@@ -238,7 +241,7 @@ class Chat(ThemedTk):
 
         
     def save_and_exit(self):
-        "methode die gerufen wird wenn ok in den Settings ok gedrückt wurde"
+        "methode die gerufen wird wenn ok in den Settings gedrückt wurde"
         self.settings_already_opend = False
         self.nickname = self.top.entry_nickname.get()
         auto_update = self.auto_refresh_checked_settings.get()
@@ -250,7 +253,7 @@ class Chat(ThemedTk):
 
 
     def cancel_and_exit(self):
-        "methode die gerufen wird wenn ok in den Settings cancel gedrückt wurde"
+        "methode die gerufen wird wenn cancel in den Settings gedrückt wurde"
         self.settings_already_opend = False
         self.toplevel.destroy()
 
